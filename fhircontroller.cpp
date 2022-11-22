@@ -73,7 +73,7 @@ void FHIRController::service(HttpRequest &request, HttpResponse &response){
         finished(reply);
     }
     else {
-        //response.setStatus(401, "Authentication failed");
+        response.setStatus(401, "Authentication failed");
         response.write("The request cannot be processed because of failed authentication.", true);
     }
 }
