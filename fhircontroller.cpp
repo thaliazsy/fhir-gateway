@@ -80,6 +80,7 @@ void FHIRController::service(HttpRequest &request, HttpResponse &response){
             qDebug("fetching resource... ");
                     qDebug() << url.toString();
 
+<<<<<<< HEAD
                     QEventLoop loop;
                     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
                     //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
@@ -109,6 +110,18 @@ void FHIRController::service(HttpRequest &request, HttpResponse &response){
 //        //response.setStatus(401, "Authentication failed");
 //        response.write("The request cannot be processed because of failed authentication.", true);
 //    }
+=======
+        QEventLoop loop;
+        connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+        //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
+        loop.exec();
+        finished(reply);
+    }
+    else {
+        response.setStatus(401, "Authentication failed");
+        response.write("The request cannot be processed because of failed authentication.", true);
+    }
+>>>>>>> 5097c72afc1836bb8dfd85f56d9e6120d7c8ce61
 }
 
 

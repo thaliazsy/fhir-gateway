@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 13.04.2023 16:49:07:907 0 DEBUG    0x7ffff468f640 HttpConnectionHandler (0x5555555e4c10): read timeout occured
 13.04.2023 16:49:07:907 0 DEBUG    0x7ffff468f640 HttpConnectionHandler (0x5555555e4c10): disconnected
 13.04.2023 16:50:15:605 0 DEBUG    0x7ffff6bd07c0 HttpListener: New connection
@@ -2785,3 +2786,5 @@
 15.04.2023 14:29:38:911 0 DEBUG    0x7ffff368d640 HttpConnectionHandler (0x5555555ecd50): disconnected
 15.04.2023 14:29:40:911 0 DEBUG    0x7ffff468f640 HttpConnectionHandler (0x5555555e5d80): read timeout occured
 15.04.2023 14:29:40:911 0 DEBUG    0x7ffff468f640 HttpConnectionHandler (0x5555555e5d80): disconnected
+=======
+>>>>>>> 5097c72afc1836bb8dfd85f56d9e6120d7c8ce61

@@ -25,8 +25,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     etc/webapp.ini
 
-include(../../QtWebApp/QtWebApp/httpserver/httpserver.pri)
-include(../../QtWebApp/QtWebApp/logging/logging.pri)
+include(httpserver/httpserver.pri)
+include(logging/logging.pri)
 
 HEADERS += \
     fhircontroller.h \
