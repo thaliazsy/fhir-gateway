@@ -54,28 +54,61 @@ void FHIRController::service(HttpRequest &request, HttpResponse &response){
 
 
 
-    if(token=="Bearer 123")
-    {
-        response.setHeader("Content-Type", "application/json");
+    //if(token=="Bearer 123")
+    //{
+        //response.setHeader("Content-Type", "application/json");
 
-        QUrl url(baseURL + request.getPath());
-        QNetworkRequest req(url);
-        req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-        QNetworkReply *reply = m_manager->get(req);
+        if(request.getMethod()=="GET"){
+            QUrl url(baseURL + request.getPath());
+            QNetworkRequest req(url);
+            //req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+            QNetworkReply *reply = m_manager->get(req);
+            qDebug("fetching resource... ");
+                    qDebug() << url.toString();
 
-        qDebug("fetching resource... ");
-        qDebug() << url.toString();
+                    QEventLoop loop;
+                    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+                    //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
+                    loop.exec();
+                    finished(reply);
+        }
+        else if(request.getMethod()=="PUT"){
+            QUrl url(baseURL + request.getPath());
+            QNetworkRequest req(url);
+            req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+            QNetworkReply *reply = m_manager->put(req, request.getBody());
+            qDebug("fetching resource... ");
+                    qDebug() << url.toString();
 
-        QEventLoop loop;
-        connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-        //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
-        loop.exec();
-        finished(reply);
-    }
-    else {
-        //response.setStatus(401, "Authentication failed");
-        response.write("The request cannot be processed because of failed authentication.", true);
-    }
+                    QEventLoop loop;
+                    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+                    //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
+                    loop.exec();
+                    finished(reply);
+        }
+        else if(request.getMethod()=="POST"){
+            QUrl url(baseURL + request.getPath());
+            QNetworkRequest req(url);
+            //req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+            QNetworkReply *reply = m_manager->post(req, request.getBody());
+            qDebug("fetching resource... ");
+                    qDebug() << url.toString();
+
+                    QEventLoop loop;
+                    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+                    //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
+                    loop.exec();
+                    finished(reply);
+        }
+
+
+
+
+//    }
+//    else {
+//        //response.setStatus(401, "Authentication failed");
+//        response.write("The request cannot be processed because of failed authentication.", true);
+//    }
 }
 
 
@@ -83,6 +116,15 @@ void FHIRController::service(HttpRequest &request, HttpResponse &response){
 void FHIRController::finished(QNetworkReply *reply){
     QString url = reply->url().toString();
     QString ret = reply->readAll();
-    response->write(url.toUtf8()+ "\n\n");
+
     response->write(ret.toUtf8());
+
+//    QJsonDocument doc = QJsonDocument::fromJson(ret.toUtf8());
+//    QJsonObject obj = doc.object();
+//    QJsonValue val = obj.value("text");
+//    QJsonObject textObj = val.toObject();
+//    QJsonValue val2 = textObj["div"];
+//    response->write("\n\n" + val2.toString().toUtf8());
+
+
 }
