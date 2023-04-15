@@ -2,6 +2,7 @@
 #include "helloworldcontroller.h"
 #include "uploadcontroller.h"
 #include "fhircontroller.h"
+#include "getfilecontroller.h"
 
 RequestMapper::RequestMapper(QObject* parent)
     : HttpRequestHandler(parent)
@@ -22,6 +23,9 @@ void RequestMapper::service(HttpRequest &request, HttpResponse &response)
     }
     else if(path.startsWith("/fhir")) {
         FHIRController().service(request, response);
+    }
+    else if(path.startsWith("/getfile")) {
+        GetFileController().service(request, response);
     }
     else {
         response.setStatus(404, "Not Found");

@@ -10,6 +10,7 @@ CONFIG -= app_bundle
 
 SOURCES += \
         fhircontroller.cpp \
+        getfilecontroller.cpp \
         global.cpp \
         helloworldcontroller.cpp \
         main.cpp \
@@ -29,6 +30,7 @@ include(../../QtWebApp/QtWebApp/logging/logging.pri)
 
 HEADERS += \
     fhircontroller.h \
+    getfilecontroller.h \
     global.h \
     helloworldcontroller.h \
     requestmapper.h \
