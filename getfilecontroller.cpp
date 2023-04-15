@@ -10,26 +10,12 @@ GetFileController::GetFileController(QObject* parent)
 
 }
 
-
-bool GetFileController::isPreflight(HttpRequest &request){
-    if(request.getMethod()=="OPTIONS"){
-        QString method = request.getHeader("Access-Control-Request-Method");
-        QString headers = request.getHeader("Access-Control-Request-Headers");
-        QString origin = request.getHeader("Origin");
-        if(method!="" && headers!="" && origin!=""){
-            return true;
-        }
-    }
-    return false;
-}
-
-
 void GetFileController::service(HttpRequest &request, HttpResponse &response){
     this->request=&request;
     this->response=&response;    //Check token
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-    response.setHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+    response.setHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 
     if(isPreflight(request)){
         response.setStatus(200);

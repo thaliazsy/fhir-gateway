@@ -1,7 +1,7 @@
 #ifndef GETFILECONTROLLER_H
 #define GETFILECONTROLLER_H
 
-
+#include "global.h"
 #include "httprequesthandler.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -18,7 +18,7 @@ public:
     GetFileController(QObject* parent=0);
     QNetworkAccessManager *m_manager;
     QNetworkRequest req;
-    bool isPreflight();
+    //bool isPreflight(HttpRequest &request);
     void service(HttpRequest& request, HttpResponse& response);
     void finished(QNetworkReply* reply);
 };

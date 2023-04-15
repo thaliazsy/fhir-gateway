@@ -26,102 +26,62 @@ QString base64UrlDecode(QByteArray ag){
 
 void FHIRController::service(HttpRequest &request, HttpResponse &response){
     this->request=&request;
-    this->response=&response;    //Check token
-    QString token = request.getHeader("Authorization");
-    if(token!="" && token.startsWith("Bearer ")){
-        token = token.mid(7);
-        QStringList jwt = token.split('.');
-        QByteArray h = QByteArray::fromBase64(jwt[0].toUtf8());
-        QByteArray p = QByteArray::fromBase64(jwt[1].toUtf8());
-        QByteArray s = QByteArray::fromBase64(jwt[2].toUtf8());
+    this->response=&response;
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    response.setHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 
-        QJsonDocument doc = QJsonDocument::fromJson(h);
-        QJsonObject header = doc.object();
-        QJsonDocument payload = QJsonDocument::fromJson(p);
-
-        //verify signature
-        QByteArray key = "your-secret-key";
-        QString alg = header["alg"].toString();
-        if(alg=="HS256"){
-
-        }
-        response.write(h + "\n");
-        response.write(p + "\n");
-        response.write(s + "\n");
-
+    if(isPreflight(request)){
+        response.setStatus(200);
     }
+    else {
+        QString token = request.getHeader("Authorization");
+        if(token!="" && token.startsWith("Bearer ")){
+            token = token.mid(7);
+            QStringList jwt = token.split('.');
+            QByteArray h = QByteArray::fromBase64(jwt[0].toUtf8());
+            QByteArray p = QByteArray::fromBase64(jwt[1].toUtf8());
+            QByteArray s = QByteArray::fromBase64(jwt[2].toUtf8());
 
+            QJsonDocument doc = QJsonDocument::fromJson(h);
+            QJsonObject header = doc.object();
+            QJsonDocument payload = QJsonDocument::fromJson(p);
 
+            //verify signature
+            QByteArray key = "your-secret-key";
+            QString alg = header["alg"].toString();
+            if(alg=="HS256"){
 
+            }
+            response.write(h + "\n");
+            response.write(p + "\n");
+            response.write(s + "\n");
 
-    //if(token=="Bearer 123")
-    //{
-        //response.setHeader("Content-Type", "application/json");
-
-        if(request.getMethod()=="GET"){
-            QUrl url(baseURL + request.getPath());
-            QNetworkRequest req(url);
-            //req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-            QNetworkReply *reply = m_manager->get(req);
-            qDebug("fetching resource... ");
-                    qDebug() << url.toString();
-
-                    QEventLoop loop;
-                    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-                    //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
-                    loop.exec();
-                    finished(reply);
         }
-        else if(request.getMethod()=="PUT"){
+
+        if(token=="Bearer 123")
+        {
+            response.setHeader("Content-Type", "application/json");
+
             QUrl url(baseURL + request.getPath());
             QNetworkRequest req(url);
             req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-            QNetworkReply *reply = m_manager->put(req, request.getBody());
+            QNetworkReply *reply = m_manager->get(req);
+
             qDebug("fetching resource... ");
-                    qDebug() << url.toString();
+            qDebug() << url.toString();
 
-<<<<<<< HEAD
-                    QEventLoop loop;
-                    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-                    //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
-                    loop.exec();
-                    finished(reply);
+            QEventLoop loop;
+            connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+            //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
+            loop.exec();
+            finished(reply);
         }
-        else if(request.getMethod()=="POST"){
-            QUrl url(baseURL + request.getPath());
-            QNetworkRequest req(url);
-            //req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-            QNetworkReply *reply = m_manager->post(req, request.getBody());
-            qDebug("fetching resource... ");
-                    qDebug() << url.toString();
-
-                    QEventLoop loop;
-                    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-                    //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
-                    loop.exec();
-                    finished(reply);
+        else {
+            response.setStatus(401, "Authentication failed");
+            response.write("The request cannot be processed because of failed authentication.", true);
         }
-
-
-
-
-//    }
-//    else {
-//        //response.setStatus(401, "Authentication failed");
-//        response.write("The request cannot be processed because of failed authentication.", true);
-//    }
-=======
-        QEventLoop loop;
-        connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-        //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
-        loop.exec();
-        finished(reply);
     }
-    else {
-        response.setStatus(401, "Authentication failed");
-        response.write("The request cannot be processed because of failed authentication.", true);
-    }
->>>>>>> 5097c72afc1836bb8dfd85f56d9e6120d7c8ce61
 }
 
 
@@ -129,15 +89,6 @@ void FHIRController::service(HttpRequest &request, HttpResponse &response){
 void FHIRController::finished(QNetworkReply *reply){
     QString url = reply->url().toString();
     QString ret = reply->readAll();
-
+    response->write(url.toUtf8()+ "\n\n");
     response->write(ret.toUtf8());
-
-//    QJsonDocument doc = QJsonDocument::fromJson(ret.toUtf8());
-//    QJsonObject obj = doc.object();
-//    QJsonValue val = obj.value("text");
-//    QJsonObject textObj = val.toObject();
-//    QJsonValue val2 = textObj["div"];
-//    response->write("\n\n" + val2.toString().toUtf8());
-
-
 }

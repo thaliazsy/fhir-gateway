@@ -2,10 +2,14 @@
 #define GLOBAL_H
 
 #include "filelogger.h"
+#include "httprequesthandler.h"
 
 using namespace stefanfrings;
 
 /** Redirects log messages to a file **/
 extern FileLogger* logger;
+
+
+bool isPreflight(HttpRequest &request);
 
 #endif // GLOBAL_H
