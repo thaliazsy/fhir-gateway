@@ -11,6 +11,8 @@ class RequestMapper : public HttpRequestHandler
 public:
     RequestMapper(QObject* parent=0);
     void service(HttpRequest& request, HttpResponse& response);
+    bool isPreflight(HttpRequest &request);
+    bool verifyToken(HttpRequest &request);
 };
 
 #endif // REQUESTMAPPER_H

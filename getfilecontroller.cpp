@@ -2,6 +2,8 @@
 #include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QFileInfo>
+#include <QMimeDatabase>
 
 GetFileController::GetFileController(QObject* parent)
     : HttpRequestHandler(parent)
@@ -11,16 +13,7 @@ GetFileController::GetFileController(QObject* parent)
 }
 
 void GetFileController::service(HttpRequest &request, HttpResponse &response){
-    this->request=&request;
-    this->response=&response;    //Check token
-    response.setHeader("Access-Control-Allow-Origin", "*");
-    response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-    response.setHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-
-    if(isPreflight(request)){
-        response.setStatus(200);
-    }
-    else {
+    this->response=&response;
 
         QString token = request.getHeader("Authorization");
 
@@ -48,13 +41,21 @@ void GetFileController::service(HttpRequest &request, HttpResponse &response){
         //    }
 
 
-        if(token=="Bearer 123")
+        if(token!="")
         {
-            response.setHeader("Content-Type", "application/pdf");
             QString filename = request.getPath();
             QFile file("/home/hapi2/Documents/" + filename);
+
+            QString mime = QMimeDatabase().mimeTypeForFile(filename).name();
+
+            response.setHeader("Content-Type", mime.toUtf8());
+            //response.setHeader("Content-Type", "image/jpeg");
+
             if(!file.open(QIODevice::ReadOnly)) return;
             QByteArray blob = file.readAll();
+            if(mime.contains("image")){
+                blob.toBase64();
+            }
             response.write(blob);
 
         }
@@ -62,7 +63,7 @@ void GetFileController::service(HttpRequest &request, HttpResponse &response){
             response.setStatus(401, "Authentication failed");
             response.write("The request cannot be processed because of failed authentication.", true);
         }
-    }
+
 }
 
 void GetFileController::finished(QNetworkReply *reply){
