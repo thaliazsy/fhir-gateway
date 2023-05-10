@@ -24,7 +24,14 @@ bool RequestMapper::isPreflight(HttpRequest &request){
 
 bool RequestMapper::verifyToken(HttpRequest &request){
     QString token = "";
-    token = request.getHeader("Authorization");
+
+    QByteArray path=request.getPath();
+    if(path.startsWith("/viewer")){
+token = request.getParameter("Authorization");
+    }
+    else {
+token = request.getHeader("Authorization");
+    }
 
     //        if(token!="" && token.startsWith("Bearer ")){
     //            token = token.mid(7);
@@ -63,33 +70,30 @@ void RequestMapper::service(HttpRequest &request, HttpResponse &response)
         response.setStatus(200);
         return;
     }
-    else {
-        //Verify Token
-        if(!verifyToken(request)){
-            response.setStatus(401, "Authentication failed");
-            response.write("The request cannot be processed because of failed authentication.", true);
-            return;
-        }
-        else {
-            if(path=="/" || path=="/hello") {
-                HelloWorldController().service(request, response);
-
-            }
-            else if(path=="/upload") {
-                UploadController().service(request, response);
-            }
-            else if(path.startsWith("/fhir")) {
-                FHIRController().service(request, response);
-            }
-            else if(path.startsWith("/getfile")) {
-                GetFileController().service(request, response);
-            }
-            else {
-                response.setStatus(404, "Not Found");
-                response.write("The URL is wrong, no such document.", true);
-            }
-            qDebug("RequestMapper: finished request");
-        }
+    //Verify Token
+    if(!verifyToken(request)){
+        response.setStatus(401, "Authentication failed");
+        response.write("The request cannot be processed because of failed authentication.", true);
+        return;
     }
-
+    if(path=="/" || path=="/hello") {
+        HelloWorldController().service(request, response);
+    }
+    else if(path=="/upload") {
+        UploadController().service(request, response);
+    }
+    else if(path.startsWith("/fhir")) {
+        FHIRController().service(request, response);
+    }
+    else if(path.startsWith("/getfile")) {
+        GetFileController().service(request, response);
+    }
+    else if(path.startsWith("/viewer")){
+        staticFileController->service(request, response);
+    }
+    else {
+        response.setStatus(404, "Not Found");
+        response.write("The URL is wrong, no such document.", true);
+    }
+    qDebug("RequestMapper: finished request");
 }
