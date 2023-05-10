@@ -15,55 +15,20 @@ GetFileController::GetFileController(QObject* parent)
 void GetFileController::service(HttpRequest &request, HttpResponse &response){
     this->response=&response;
 
-        QString token = request.getHeader("Authorization");
+    QString filename = request.getPath();
+    QFile file("/home/hapi2/Documents/" + filename);
 
-        //    if(token!="" && token.startsWith("Bearer ")){
-        //        token = token.mid(7);
-        //        QStringList jwt = token.split('.');
-        //        QByteArray h = QByteArray::fromBase64(jwt[0].toUtf8());
-        //        QByteArray p = QByteArray::fromBase64(jwt[1].toUtf8());
-        //        QByteArray s = QByteArray::fromBase64(jwt[2].toUtf8());
+    QString mime = QMimeDatabase().mimeTypeForFile(filename).name();
 
-        //        QJsonDocument doc = QJsonDocument::fromJson(h);
-        //        QJsonObject header = doc.object();
-        //        QJsonDocument payload = QJsonDocument::fromJson(p);
+    response.setHeader("Content-Type", mime.toUtf8());
+    //response.setHeader("Content-Type", "image/jpeg");
 
-        //        //verify signature
-        //        QByteArray key = "your-secret-key";
-        //        QString alg = header["alg"].toString();
-        //        if(alg=="HS256"){
-
-        //        }
-        //        response.write(h + "\n");
-        //        response.write(p + "\n");
-        //        response.write(s + "\n");
-
-        //    }
-
-
-        if(token!="")
-        {
-            QString filename = request.getPath();
-            QFile file("/home/hapi2/Documents/" + filename);
-
-            QString mime = QMimeDatabase().mimeTypeForFile(filename).name();
-
-            response.setHeader("Content-Type", mime.toUtf8());
-            //response.setHeader("Content-Type", "image/jpeg");
-
-            if(!file.open(QIODevice::ReadOnly)) return;
-            QByteArray blob = file.readAll();
-            if(mime.contains("image")){
-                blob.toBase64();
-            }
-            response.write(blob);
-
-        }
-        else {
-            response.setStatus(401, "Authentication failed");
-            response.write("The request cannot be processed because of failed authentication.", true);
-        }
-
+    if(!file.open(QIODevice::ReadOnly)) return;
+    QByteArray blob = file.readAll();
+    if(mime.contains("image")){
+        blob.toBase64();
+    }
+    response.write(blob);
 }
 
 void GetFileController::finished(QNetworkReply *reply){
