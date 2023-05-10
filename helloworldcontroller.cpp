@@ -7,5 +7,5 @@ HelloWorldController::HelloWorldController(QObject* parent)
 }
 
 void HelloWorldController::service(HttpRequest &request, HttpResponse &response){
-    response.write("Hello World", true);
+    response.write("Hello World\n\n<br><br>");
 }
