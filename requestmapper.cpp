@@ -3,6 +3,7 @@
 #include "uploadcontroller.h"
 #include "fhircontroller.h"
 #include "getfilecontroller.h"
+#include "sli-viewer-controller.h"
 
 RequestMapper::RequestMapper(QObject* parent)
     : HttpRequestHandler(parent)
@@ -10,7 +11,8 @@ RequestMapper::RequestMapper(QObject* parent)
 
 }
 
-bool RequestMapper::isPreflight(HttpRequest &request){
+bool RequestMapper::isPreflight(HttpRequest &request)
+{
     if(request.getMethod()=="OPTIONS"){
         QString method = request.getHeader("Access-Control-Request-Method");
         QString headers = request.getHeader("Access-Control-Request-Headers");
@@ -22,15 +24,20 @@ bool RequestMapper::isPreflight(HttpRequest &request){
     return false;
 }
 
-bool RequestMapper::verifyToken(HttpRequest &request){
+bool RequestMapper::verifyToken(HttpRequest &request)
+{
     QString token = "";
+    QByteArray referer = request.getHeader("Referer");
 
-    QByteArray path=request.getPath();
-    if(path.startsWith("/viewer")){
-token = request.getParameter("Authorization");
+    QByteArray path = request.getPath();
+    if (path.startsWith("/ReportCreator")) {
+        token = request.getParameter("Authorization");
+    }
+    else if (referer.contains("ReportCreator")) {
+        return true;
     }
     else {
-token = request.getHeader("Authorization");
+        token = request.getHeader("Authorization");
     }
 
     //        if(token!="" && token.startsWith("Bearer ")){
@@ -54,12 +61,13 @@ token = request.getHeader("Authorization");
     //            response.write(s + "\n");
     //        }
 
-    return (token!="");
+    return (token != "");
 }
 
 void RequestMapper::service(HttpRequest &request, HttpResponse &response)
 {
     QByteArray path=request.getPath();
+    QByteArray referer = request.getHeader("Referer");
     qDebug("RequestMapper: path=%s", path.data());
 
     response.setHeader("Access-Control-Allow-Origin", "*");
@@ -88,8 +96,19 @@ void RequestMapper::service(HttpRequest &request, HttpResponse &response)
     else if(path.startsWith("/getfile")) {
         GetFileController().service(request, response);
     }
-    else if(path.startsWith("/viewer")){
-        staticFileController->service(request, response);
+    else if(path.startsWith("/ReportCreator") || referer.contains("ReportCreator")){
+        SLIViewerController().service(request, response);
+    }
+    else if(path.startsWith("/skin-lesion-viewer")){
+
+        response.write("<html><body>");
+        response.write("<h1>This is Viewer</h1>");
+        response.write("<p>Access Token: " + request.getParameter("Authorization") + "</p>");
+        response.write("<p>Document URL: " + request.getParameter("docUrl") + "</p>");
+        response.write("</body></hhtml>");
+        //dynamically generate js
+        //
+        //staticFileController->service(request, response);
     }
     else {
         response.setStatus(404, "Not Found");

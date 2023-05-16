@@ -16,6 +16,7 @@ SOURCES += \
         helloworldcontroller.cpp \
         main.cpp \
         requestmapper.cpp \
+        sli-viewer-controller.cpp \
         uploadcontroller.cpp
 
 # Default rules for deployment.
@@ -35,4 +36,5 @@ HEADERS += \
     global.h \
     helloworldcontroller.h \
     requestmapper.h \
+    sli-viewer-controller.h \
     uploadcontroller.h
