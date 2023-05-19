@@ -1,9 +1,8 @@
 #include "sli-viewer-controller.h"
-#include "qmimedatabase.h"
-#include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMimeDatabase>
+#include <QNetworkCookie>
 
 SLIViewerController::SLIViewerController(QObject* parent)
     : HttpRequestHandler(parent)
@@ -33,9 +32,8 @@ void getLocalFiles(HttpRequest &request, HttpResponse &response){
 
 void SLIViewerController::service(HttpRequest &request, HttpResponse &response){
     this->response=&response;
-    this->request=&request;
 
-    QByteArray path = request.getPath();
+    QByteArray path=request.getPath();
     if(path.startsWith("/ReportCreator")){
         QByteArray params = "?documentbundle=" + request.getParameter("documentbundle");
 

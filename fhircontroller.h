@@ -1,10 +1,10 @@
 #ifndef FHIRCONTROLLER_H
 #define FHIRCONTROLLER_H
 
-#include "global.h"
 #include "httprequesthandler.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QEventLoop>
 
 using namespace stefanfrings;
 

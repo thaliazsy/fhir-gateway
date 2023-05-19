@@ -49,7 +49,7 @@ QString searchConfigFile()
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    QString configFileName = searchConfigFile();    //"../fhir-gateway/etc/webapp.ini";
+    QString configFileName = searchConfigFile();
 
     // Configure logging
     QSettings* logSettings = new QSettings(configFileName, QSettings::IniFormat, &a);
@@ -65,12 +65,12 @@ int main(int argc, char *argv[])
     fileSettings->beginGroup("docroot");
     staticFileController=new StaticFileController(fileSettings,&a);
 
-    //Configure HTTP server listener
+    // Configure HTTP server listener
     QSettings* listenerSettings = new QSettings(configFileName, QSettings::IniFormat, &a);
     listenerSettings->beginGroup("listener");
     qDebug("config file loaded");
 
-    //Start HTTP server
+    // Start HTTP server
     new HttpListener(listenerSettings, new RequestMapper(&a), &a);
 
     return a.exec();

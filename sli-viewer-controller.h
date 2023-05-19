@@ -1,10 +1,10 @@
 #ifndef SLI-VIEWER-CONTROLLER_H
 #define SLI-VIEWER-CONTROLLER_H
 
-#include "global.h"
 #include "httprequesthandler.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QEventLoop>
 
 using namespace stefanfrings;
 

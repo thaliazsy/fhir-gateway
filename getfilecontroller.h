@@ -1,10 +1,10 @@
 #ifndef GETFILECONTROLLER_H
 #define GETFILECONTROLLER_H
 
-#include "global.h"
 #include "httprequesthandler.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QEventLoop>
 
 using namespace stefanfrings;
 

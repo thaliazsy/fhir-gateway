@@ -1,5 +1,4 @@
 #include "fhircontroller.h"
-#include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
 
@@ -7,24 +6,23 @@ FHIRController::FHIRController(QObject* parent)
     : HttpRequestHandler(parent)
 {
     m_manager = new QNetworkAccessManager();
-
 }
 
-QString base64UrlEncode(QByteArray ag){
+QString base64UrlEncode(QByteArray ag) {
     QString str = ag.toBase64(QByteArray::OmitTrailingEquals);
     str = str.replace("+", "-");
     str = str.replace("/", "_");
     return str;
 }
 
-QString base64UrlDecode(QByteArray ag){
+QString base64UrlDecode(QByteArray ag) {
     QByteArray str = ag.replace("-", "+");
     str = str.replace("_", "/");
     str = ag.fromBase64(str);
     return str;
 }
 
-void FHIRController::service(HttpRequest &request, HttpResponse &response){
+void FHIRController::service(HttpRequest &request, HttpResponse &response) {
     this->response=&response;
 
     response.setHeader("Content-Type", "application/json");
@@ -34,7 +32,7 @@ void FHIRController::service(HttpRequest &request, HttpResponse &response){
 
     QNetworkReply *reply = nullptr;
 
-    if(request.getMethod()=="GET"){
+    if(request.getMethod()=="GET") {
         reply = m_manager->get(req);
     }
     else if(request.getMethod()=="PUT"){
@@ -49,7 +47,6 @@ void FHIRController::service(HttpRequest &request, HttpResponse &response){
 
     QEventLoop loop;
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    //connect(m_manager, &QNetworkAccessManager::finished, this, &FHIRController::finished);
     loop.exec();
     finished(reply);
 }

@@ -1,5 +1,4 @@
 #include "getfilecontroller.h"
-#include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFileInfo>
@@ -21,7 +20,6 @@ void GetFileController::service(HttpRequest &request, HttpResponse &response){
     QString mime = QMimeDatabase().mimeTypeForFile(filename).name();
 
     response.setHeader("Content-Type", mime.toUtf8());
-    //response.setHeader("Content-Type", "image/jpeg");
 
     if(!file.open(QIODevice::ReadOnly)) return;
     QByteArray blob = file.readAll();
