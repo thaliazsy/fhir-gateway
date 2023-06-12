@@ -9,29 +9,26 @@ UploadController::UploadController(QObject* parent)
 void UploadController::service(HttpRequest &request, HttpResponse &response){
 
     this->request=&request;
-    this->response=&response;    //Check token
-    if(true)
+    this->response=&response;
+    QByteArray filename = request.getParameter("file-name");
+    QTemporaryFile* tempFile=request.getUploadedFile("image-input");
+    if (tempFile)
     {
-        QByteArray img = request.getParameter("image-input");
-        QByteArray imageData = QByteArray::fromBase64(img);
+        QFile file(rootdir + filename);
+        if(file.open(QIODevice::WriteOnly)){
+            while (!tempFile->atEnd() && !tempFile->error())
+            {
+                QByteArray buffer=tempFile->read(65536);
+                file.write(buffer);
+            }
+            response.write(outpath + filename);
+        }
+        else {
+               response.write("Upload failed. \"file-name\" not found.", true);
+        }
     }
     else
-    //request.getParameter("action")=="show")
-        {
-            response.setHeader("Content-Type", "image/jpeg");
-            QTemporaryFile* file=request.getUploadedFile("image-input");
-            if (file)
-            {
-                while (!file->atEnd() && !file->error())
-                {
-                    QByteArray buffer=file->read(65536);
-                    response.write(buffer);
-                }
-            }
-            else
-            {
-                response.write("upload failed");
-            }
-        }
-
+    {
+        response.write("Upload failed. \"image-input\" not found.", true);
+    }
 }
