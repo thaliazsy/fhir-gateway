@@ -1,6 +1,4 @@
 #include "fhircontroller.h"
-#include <QJsonDocument>
-#include <QJsonObject>
 
 FHIRController::FHIRController(QObject* parent)
     : HttpRequestHandler(parent)
@@ -8,37 +6,29 @@ FHIRController::FHIRController(QObject* parent)
     m_manager = new QNetworkAccessManager();
 }
 
-QString base64UrlEncode(QByteArray ag) {
-    QString str = ag.toBase64(QByteArray::OmitTrailingEquals);
-    str = str.replace("+", "-");
-    str = str.replace("/", "_");
-    return str;
-}
 
-QString base64UrlDecode(QByteArray ag) {
-    QByteArray str = ag.replace("-", "+");
-    str = str.replace("_", "/");
-    str = ag.fromBase64(str);
-    return str;
-}
 
 void FHIRController::service(HttpRequest &request, HttpResponse &response) {
     this->response=&response;
 
     response.setHeader("Content-Type", "application/json");
-    QUrl url(baseURL + request.getPath());
+
+    QByteArray params = getParameters(request);
+
+    // Send request
+    QUrl url(baseURL + request.getPath() + params);
     QNetworkRequest req(url);
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     QNetworkReply *reply = nullptr;
 
-    if(request.getMethod()=="GET") {
+    if (request.getMethod() == "GET") {
         reply = m_manager->get(req);
     }
-    else if(request.getMethod()=="PUT"){
+    else if (request.getMethod() == "PUT") {
         reply = m_manager->put(req, request.getBody());
     }
-    else if(request.getMethod()=="POST"){
+    else if (request.getMethod() == "POST") {
         reply = m_manager->post(req, request.getBody());
     }
 

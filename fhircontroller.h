@@ -1,6 +1,7 @@
 #ifndef FHIRCONTROLLER_H
 #define FHIRCONTROLLER_H
 
+#include "global.h"
 #include "httprequesthandler.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -12,7 +13,7 @@ class FHIRController: public HttpRequestHandler
 {
     Q_OBJECT
 public:
-    QString baseURL = "http://localhost:8080";
+    QByteArray baseURL = "http://localhost:8080";
     HttpRequest* request;
     HttpResponse* response;
     FHIRController(QObject* parent=0);
