@@ -15,13 +15,17 @@ void GetFileController::service(HttpRequest &request, HttpResponse &response){
     this->response=&response;
 
     QString filename = request.getPath();
-    QFile file("/home/hapi2/Documents/" + filename);
+    QFile file(rootdir + filename);
 
     QString mime = QMimeDatabase().mimeTypeForFile(filename).name();
 
     response.setHeader("Content-Type", mime.toUtf8());
 
-    if(!file.open(QIODevice::ReadOnly)) return;
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        response.setStatus(404, "Not Found");
+        return;
+    }
     QByteArray blob = file.readAll();
     if(mime.contains("image")){
         blob.toBase64();

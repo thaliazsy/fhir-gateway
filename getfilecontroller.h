@@ -12,7 +12,7 @@ class GetFileController: public HttpRequestHandler
 {
     Q_OBJECT
 public:
-    QString baseURL = "http://localhost:8080";
+    QByteArray rootdir = "/home/hapi2/Documents";
     HttpRequest* request;
     HttpResponse* response;
     GetFileController(QObject* parent=0);
