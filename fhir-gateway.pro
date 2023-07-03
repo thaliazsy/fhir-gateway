@@ -10,14 +10,14 @@ CONFIG -= app_bundle
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        fhircontroller.cpp \
-        getfilecontroller.cpp \
-        global.cpp \
-        helloworldcontroller.cpp \
-        main.cpp \
-        requestmapper.cpp \
-        sli-viewer-controller.cpp \
-        uploadcontroller.cpp
+        src/global.cpp \
+        src/main.cpp \
+        src/requestmapper.cpp \
+        src/controller/fhircontroller.cpp \
+        src/controller/getfilecontroller.cpp \
+        src/controller/helloworldcontroller.cpp \
+        src/controller/sli-viewer-controller.cpp \
+        src/controller/uploadcontroller.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -31,10 +31,10 @@ include(httpserver/httpserver.pri)
 include(logging/logging.pri)
 
 HEADERS += \
-    fhircontroller.h \
-    getfilecontroller.h \
-    global.h \
-    helloworldcontroller.h \
-    requestmapper.h \
-    sli-viewer-controller.h \
-    uploadcontroller.h
+    src/global.h \
+    src/requestmapper.h \
+    src/controller/fhircontroller.h \
+    src/controller/getfilecontroller.h \
+    src/controller/helloworldcontroller.h \
+    src/controller/sli-viewer-controller.h \
+    src/controller/uploadcontroller.h

@@ -1,7 +1,7 @@
-#ifndef FHIRCONTROLLER_H
-#define FHIRCONTROLLER_H
+#ifndef SLI-VIEWER-CONTROLLER_H
+#define SLI-VIEWER-CONTROLLER_H
 
-#include "global.h"
+#include "../global.h"
 #include "httprequesthandler.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -9,18 +9,18 @@
 
 using namespace stefanfrings;
 
-class FHIRController: public HttpRequestHandler
+class SLIViewerController: public HttpRequestHandler
 {
     Q_OBJECT
 public:
-    QByteArray baseURL = "http://localhost:8080";
+    QByteArray baseURL = "http://localhost:5000";
     HttpRequest* request;
     HttpResponse* response;
-    FHIRController(QObject* parent=0);
+    SLIViewerController(QObject* parent=0);
     QNetworkAccessManager *m_manager;
     QNetworkRequest req;
     void service(HttpRequest& request, HttpResponse& response);
     void finished(QNetworkReply* reply);
 };
 
-#endif // FHIRCONTROLLER_H
+#endif // SLI-VIEWER-CONTROLLER_H

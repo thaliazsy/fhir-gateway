@@ -1,9 +1,4 @@
 #include "requestmapper.h"
-#include "helloworldcontroller.h"
-#include "uploadcontroller.h"
-#include "fhircontroller.h"
-#include "getfilecontroller.h"
-#include "sli-viewer-controller.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 

@@ -3,6 +3,13 @@
 
 #include "httprequesthandler.h"
 
+// API Requests
+#include "controller/helloworldcontroller.h"
+#include "controller/uploadcontroller.h"
+#include "controller/fhircontroller.h"
+#include "controller/getfilecontroller.h"
+#include "controller/sli-viewer-controller.h"
+
 using namespace stefanfrings;
 
 class RequestMapper : public HttpRequestHandler

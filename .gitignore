@@ -11,7 +11,8 @@
 *.dylib
 
 # Project debug logs
-*webapp.log
+*.webapp.log
+/.qmake.stash
 
 # Qt-es
 object_script.*.Release
