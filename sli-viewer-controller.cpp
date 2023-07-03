@@ -34,19 +34,46 @@ void SLIViewerController::service(HttpRequest &request, HttpResponse &response){
     this->response=&response;
 
     QByteArray path=request.getPath();
-    if(path.startsWith("/ReportCreator")){
-        QByteArray params = "?documentbundle=" + request.getParameter("documentbundle");
+    QByteArray referer = request.getHeader("Referer");
 
-        QUrl url(baseURL + request.getPath() + params);
-
-        qDebug("fetching resource... ");
-        qDebug() << url.toString();
-
-        QNetworkRequest req(url);
-
+    if(path.startsWith("/skinlesionimage-ms")) {
         QNetworkReply *reply = nullptr;
 
-        reply = m_manager->get(req);
+        QByteArray params = getParameters(request);
+
+        if(referer.contains("skinlesionimage-ms")) {
+
+            QUrl url(baseURL + path + params);
+
+            QNetworkRequest req(url);
+
+            //Get Cookies
+            QMapIterator<QByteArray,QByteArray> cookies(request.getCookieMap());
+            QList<QNetworkCookie> cookieJar;
+            while(cookies.hasNext()){
+                cookies.next();
+                cookieJar.append(QNetworkCookie(cookies.key(), cookies.value()));
+                QByteArray cookieStr = cookies.key() + "=" + cookies.value()+";";
+            }
+            req.setHeader(QNetworkRequest::KnownHeaders::CookieHeader, QVariant::fromValue(cookieJar));
+
+            if(request.getMethod()=="GET"){
+                reply = m_manager->get(req);
+            }
+            else if(request.getMethod()=="PUT"){
+                reply = m_manager->put(req, request.getBody());
+            }
+            else if(request.getMethod()=="POST"){
+                req.setHeader(QNetworkRequest::ContentTypeHeader, request.getHeader("Content-Type"));
+                reply = m_manager->post(req, request.getBody());
+            }
+        }
+        else {
+            QByteArray params = "?documentbundle=" + request.getParameter("documentbundle");
+            QUrl url(baseURL + path + params);
+            QNetworkRequest req(url);
+            reply = m_manager->get(req);
+        }
 
         QEventLoop loop;
         connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
@@ -59,6 +86,27 @@ void SLIViewerController::service(HttpRequest &request, HttpResponse &response){
 }
 
 void SLIViewerController::finished(QNetworkReply *reply){
-    QString ret = reply->readAll();
-    response->write(ret.toUtf8(), true);
+    if(reply->error()) {
+        response->write(reply->errorString().toUtf8(), true);
+    }
+    else {
+        QList<QNetworkReply::RawHeaderPair> pairs = reply->rawHeaderPairs();
+
+        QByteArray cookieStr = reply->rawHeader("Set-Cookie");
+        if(cookieStr!=""){
+            QList<QByteArray> cookieJar = cookieStr.split('\n');
+            foreach(QByteArray cookie, cookieJar){
+                response->setCookie(HttpCookie(cookie));
+            }
+        }
+
+        foreach (QNetworkReply::RawHeaderPair pair, pairs) {
+            if(pair.first != "Transfer-Encoding" && pair.first!="Set-Cookie"){
+                response->setHeader(pair.first, pair.second);
+            }
+        }
+
+        QString ret = reply->readAll();
+        response->write(ret.toUtf8(), true);
+    }
 }
