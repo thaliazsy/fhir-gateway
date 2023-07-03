@@ -19,6 +19,8 @@ public:
     QNetworkAccessManager *m_manager;
     QNetworkRequest req;
     void service(HttpRequest& request, HttpResponse& response);
+    void getSingleFile(HttpRequest& request, HttpResponse& response);
+    void getMultipleFiles(HttpRequest& request, HttpResponse& response);
     void finished(QNetworkReply* reply);
 };
 
