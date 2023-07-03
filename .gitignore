@@ -12,7 +12,7 @@
 
 # Project debug logs
 *.webapp.log
-/.qmake.stash
+/.qtc_clangd
 
 # Qt-es
 object_script.*.Release
