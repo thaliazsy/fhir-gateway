@@ -4,6 +4,8 @@
 #include "fhircontroller.h"
 #include "getfilecontroller.h"
 #include "sli-viewer-controller.h"
+#include <QJsonDocument>
+#include <QJsonObject>
 
 RequestMapper::RequestMapper(QObject* parent)
     : HttpRequestHandler(parent)
@@ -26,40 +28,39 @@ bool RequestMapper::isPreflight(HttpRequest &request)
 
 bool RequestMapper::verifyToken(HttpRequest &request)
 {
+    //QString token = "123";
     QString token = "";
     QByteArray referer = request.getHeader("Referer");
-
     QByteArray path = request.getPath();
-    if (path.startsWith("/ReportCreator")) {
-        token = request.getParameter("Authorization");
+
+    if (referer.contains("skinlesionimage-ms")) {
+           return true;
     }
-    else if (referer.contains("ReportCreator")) {
-        return true;
+    else if (path.startsWith("/skinlesionimage-ms")) {
+        token = request.getParameter("Authorization");
     }
     else {
         token = request.getHeader("Authorization");
     }
 
-    //        if(token!="" && token.startsWith("Bearer ")){
-    //            token = token.mid(7);
-    //            QStringList jwt = token.split('.');
-    //            QByteArray h = QByteArray::fromBase64(jwt[0].toUtf8());
-    //            QByteArray p = QByteArray::fromBase64(jwt[1].toUtf8());
-    //            QByteArray s = QByteArray::fromBase64(jwt[2].toUtf8());
+//            if(token!="" && token.startsWith("Bearer ")){
+//                token = token.mid(7);
+//                QStringList jwt = token.split('.');
+//                QByteArray h = QByteArray::fromBase64(jwt[0].toUtf8());
+//                QByteArray p = QByteArray::fromBase64(jwt[1].toUtf8());
+//                QByteArray s = QByteArray::fromBase64(jwt[2].toUtf8());
 
-    //            QJsonDocument doc = QJsonDocument::fromJson(h);
-    //            QJsonObject header = doc.object();
-    //            QJsonDocument payload = QJsonDocument::fromJson(p);
+//                QJsonDocument doc = QJsonDocument::fromJson(h);
+//                QJsonObject header = doc.object();
+//                QJsonDocument payload = QJsonDocument::fromJson(p);
 
-    //            //verify signature
-    //            QByteArray key = "your-secret-key";
-    //            QString alg = header["alg"].toString();
-    //            if(alg=="HS256"){
-    //            }
-    //            response.write(h + "\n");
-    //            response.write(p + "\n");
-    //            response.write(s + "\n");
-    //        }
+//                //verify signature
+//                QByteArray key = "H707-tzuchiuniverisity-masterprogram-110";
+//                QString alg = header["alg"].toString();
+//                if(alg=="HS256"){
+
+//                }
+//            }
 
     return (token != "");
 }
@@ -71,13 +72,15 @@ void RequestMapper::service(HttpRequest &request, HttpResponse &response)
     qDebug("RequestMapper: path=%s", path.data());
 
     response.setHeader("Access-Control-Allow-Origin", "*");
-    response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-    response.setHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+
     if(isPreflight(request)){
         qDebug("RequestMapper: preflight request");
+        response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+        response.setHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
         response.setStatus(200);
         return;
     }
+
     //Verify Token
     if(!verifyToken(request)){
         response.setStatus(401, "Authentication failed");
@@ -96,7 +99,7 @@ void RequestMapper::service(HttpRequest &request, HttpResponse &response)
     else if(path.startsWith("/getfile")) {
         GetFileController().service(request, response);
     }
-    else if(path.startsWith("/ReportCreator") || referer.contains("ReportCreator")){
+    else if(path.startsWith("/skinlesionimage-ms") || referer.contains("skinlesionimage-ms")){
         SLIViewerController().service(request, response);
     }
     else if(path.startsWith("/skin-lesion-viewer")){
