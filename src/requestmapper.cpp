@@ -58,6 +58,7 @@ bool RequestMapper::verifyToken(HttpRequest &request)
 //            }
 
     return (token != "");
+    //return true;
 }
 
 void RequestMapper::service(HttpRequest &request, HttpResponse &response)
@@ -65,6 +66,8 @@ void RequestMapper::service(HttpRequest &request, HttpResponse &response)
     QByteArray path=request.getPath();
     QByteArray referer = request.getHeader("Referer");
     qDebug("RequestMapper: path=%s", path.data());
+
+    QJsonObject jsonObj;
 
     response.setHeader("Access-Control-Allow-Origin", "*");
 
@@ -79,7 +82,9 @@ void RequestMapper::service(HttpRequest &request, HttpResponse &response)
     //Verify Token
     if(!verifyToken(request)){
         response.setStatus(401, "Authentication failed");
-        response.write("The request cannot be processed because of failed authentication.", true);
+        jsonObj.insert("error", "The request cannot be processed because of failed authentication.");
+        QJsonDocument doc(jsonObj);
+        response.write(doc.toJson(), true);
         return;
     }
     if(path=="/" || path=="/hello") {
@@ -104,13 +109,16 @@ void RequestMapper::service(HttpRequest &request, HttpResponse &response)
         response.write("<p>Access Token: " + request.getParameter("Authorization") + "</p>");
         response.write("<p>Document URL: " + request.getParameter("docUrl") + "</p>");
         response.write("</body></hhtml>");
+
         //dynamically generate js
         //
         //staticFileController->service(request, response);
     }
     else {
         response.setStatus(404, "Not Found");
-        response.write("The URL is wrong, no such document.", true);
+        jsonObj.insert("error", "The URL is wrong, no such document.");
     }
+    QJsonDocument doc(jsonObj);
+    response.write(doc.toJson(), true);
     qDebug("RequestMapper: finished request");
 }

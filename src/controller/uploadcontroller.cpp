@@ -1,5 +1,7 @@
 #include "uploadcontroller.h"
 #include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 UploadController::UploadController(QObject* parent)
     : HttpRequestHandler(parent)
@@ -11,9 +13,12 @@ void UploadController::service(HttpRequest &request, HttpResponse &response){
 
     this->request=&request;
     this->response=&response;
-    QByteArray encounter = request.getParameter("encounter-name");
-    QByteArray filename = request.getParameter("file-name");
-    QTemporaryFile* tempFile=request.getUploadedFile("image-input");
+    QByteArray encounter = request.getParameter("encounter-id");
+    QByteArray filename = request.getParameter("file-input");
+    QTemporaryFile* tempFile=request.getUploadedFile("file-input");
+
+    QJsonObject jsonObj;
+
     if (tempFile)
     {
         QString path = rootdir + encounter;
@@ -23,20 +28,23 @@ void UploadController::service(HttpRequest &request, HttpResponse &response){
             dir.mkpath(".");
         }
         QFile file(path + "/" + filename);
-        if(file.open(QIODevice::WriteOnly)){
+        if(file.open(QIODevice::WriteOnly)) {
             while (!tempFile->atEnd() && !tempFile->error())
             {
                 QByteArray buffer=tempFile->read(65536);
                 file.write(buffer);
             }
-            response.write(outpath + encounter + "/" + filename);
-        }
-        else {
-               response.write("Upload failed. \"file-name\" not found.", true);
+
+            QString outStr(outpath + encounter + "/" + filename);
+            jsonObj.insert("url", outStr);
         }
     }
     else
     {
-        response.write("Upload failed. \"image-input\" not found.", true);
+        response.setStatus(400);
+        jsonObj.insert("error", "Upload failed. \"image-input\" not found");
+
     }
+    QJsonDocument doc(jsonObj);
+    response.write(doc.toJson(), true);
 }
